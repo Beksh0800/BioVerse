@@ -10,7 +10,23 @@ import { Badge } from "@/components/ui/badge";
 import { CertificateView } from "@/components/certificate/certificate-view";
 import { Reveal } from "@/components/motion/reveal";
 
-type Params = { params: Promise<{ number: string }> };
+type Params = {
+  params: Promise<{ number: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+};
+
+/**
+ * Дата выдачи приходит из QR-кода параметром `d`.
+ *
+ * Значение из адреса попадает на страницу, поэтому принимаем строго формат
+ * ДД.ММ.ГГГГ и всё остальное отбрасываем — иначе в «Берілген күні» можно
+ * было бы подставить произвольный текст, просто отредактировав ссылку.
+ */
+function readDate(raw: string | string[] | undefined) {
+  const value = Array.isArray(raw) ? raw[0] : raw;
+  if (typeof value !== "string") return null;
+  return /^\d{2}\.\d{2}\.\d{4}$/.test(value) ? value : null;
+}
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { number } = await params;
@@ -27,7 +43,10 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
  * демонстрационный сертификат — номер из адреса подставляется в бланк, чтобы
  * сценарий «сканирую → вижу свой документ → скачиваю» выглядел цельно.
  */
-export default async function CertificateVerifyPage({ params }: Params) {
+export default async function CertificateVerifyPage({
+  params,
+  searchParams,
+}: Params) {
   const { number } = await params;
   const certificateNumber = decodeURIComponent(number);
 
@@ -36,7 +55,8 @@ export default async function CertificateVerifyPage({ params }: Params) {
     grade: demoCertificate.grade,
     project: demoCertificate.project,
     number: certificateNumber,
-    date: portfolioProject.date,
+    // Дата с бланка; если ссылку открыли без параметра — демонстрационная.
+    date: readDate((await searchParams).d) ?? portfolioProject.date,
   };
 
   return (
