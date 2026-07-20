@@ -1,36 +1,138 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# BIOVERSE
 
-## Getting Started
+Демонстрационная веб-платформа авторской системы **BIOVERSE** — оценки PBL-проектов по биологии. Сделана для конкурса **Daryn Teacher Prize**.
 
-First, run the development server:
+Весь интерфейс на казахском языке. Это витрина методики, а не LMS: регистрации, базы данных и личных кабинетов нет, все данные — демонстрационные константы в коде.
+
+---
+
+## Запуск
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev          # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Сборка и продакшн-режим:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run build
+npm run start
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## AI-помощник
 
-To learn more about Next.js, take a look at the following resources:
+Чат работает через OpenRouter. Ключ кладётся в `.env` в корне проекта:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+OPENROUTER_API_KEY=sk-or-v1-ваш-ключ
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Ключ читается только на сервере (`src/app/api/chat/route.ts`) и в браузер не попадает.
 
-## Deploy on Vercel
+**Пока ключа нет, сайт не ломается**: чат отвечает заготовленным текстом про построение гипотезы и план исследования. Так же он поведёт себя, если во время защиты пропадёт интернет или закончится лимит — вместо ошибки зритель увидит осмысленный ответ.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Модель по умолчанию — `google/gemini-2.5-flash-lite`. Выбрана после сравнения семи моделей на казахских вопросах по биологии: держит качество ответов наравне со старшими моделями, но вдвое быстрее и дешевле. Отчёты сравнения — `_source/model-report.txt` и `_source/lite-report.txt`.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Сменить модель можно через `OPENROUTER_MODEL` в `.env`.
+
+### Если чат отвечает демо-текстом при живом ключе
+
+Значит запрос к OpenRouter не прошёл. **Причина всегда пишется в консоль сервера** — ищите строку `[BIOVERSE AI] Демо-режим: …`. Чаще всего это неверный идентификатор модели: сайт при этом выглядит рабочим, и без лога понять причину невозможно. Точные id — на https://openrouter.ai/models.
+
+---
+
+## Где менять контент
+
+Тексты, цифры и данные вынесены в [src/content/](src/content/) — вёрстку для правок трогать не нужно:
+
+| Файл | Что внутри |
+| --- | --- |
+| [site.ts](src/content/site.ts) | Название, девиз, счётчики дашборда, этапы проекта |
+| [projects.ts](src/content/projects.ts) | Пять PBL-проектов целиком |
+| [bioscore.ts](src/content/bioscore.ts) | Критерии BIO SCORE, их веса и шкала уровней |
+| [analytics.ts](src/content/analytics.ts) | Графики, рейтинг, KPI |
+| [author.ts](src/content/author.ts) | Данные автора и разделы «BIOVERSE туралы» |
+| [portfolio.ts](src/content/portfolio.ts) | QR-портфолио: результаты замеров, дневник, слайды |
+| [nav.ts](src/content/nav.ts) | Пункты меню |
+
+### Фото автора
+
+Сейчас вместо фотографии — аватар с инициалом. Чтобы поставить настоящее фото: положите файл в `public/images/` и укажите путь в поле `photo` файла [author.ts](src/content/author.ts). Там же меняются ФИО, должность и школа.
+
+### QR на сертификате
+
+Код на бланке ведёт на страницу `/certificate/<номер>` — её открывает тот, кто сканирует лист телефоном. Там показывается подтверждение подлинности, паспорт документа и кнопка скачивания PDF.
+
+Базы данных в проекте нет, поэтому по любому номеру открывается один и тот же демонстрационный сертификат ([certificate.ts](src/content/certificate.ts)) — номер из адреса подставляется в бланк, чтобы сценарий выглядел цельно.
+
+Размер кода на бланке (84 px) и уровень коррекции подобраны так, чтобы он читался камерой с распечатанного A4. Проверяется скриптом `_source/test-qr-print.mjs`: он вырезает код из растра, который уходит в PDF, и пробует его распознать.
+
+### Что показывает портфолио
+
+Страница построена как жизненный цикл PBL-проекта: обложка → паспорт → восемь этапов PBL → дневник наблюдений → практическая часть → результаты → BIO SCORE → отзыв AI → презентация защиты → рефлексия ученика → отзыв учителя → сводка и сертификат.
+
+Паспорт (цель, вопрос, гипотеза, оборудование, практика) **не дублируется** в [portfolio.ts](src/content/portfolio.ts) — он берётся из [projects.ts](src/content/projects.ts) по `projectId`. Правка в карточке проекта меняет и портфолио.
+
+BIO SCORE, AI-отзыв и сертификат показаны здесь **кратко, со ссылкой на свою страницу**. Это сделано намеренно: если портфолио воспроизводит эти разделы целиком, соответствующие пункты меню теряют смысл.
+
+### Демонстрационные данные
+
+Замеры для графика, рефлексия ученицы, отзыв учителя, текст AI-отзыва и цифры сводки — демонстрационные. Замеры повторяют реальную картину поглощения света хлорофиллом (зелёный отражается, поэтому по нему рост наименьший). На карточке результатов стоит пометка «Демо деректер». Если появятся настоящие замеры, менять только массив `growthResults`; пометку тогда стоит снять.
+
+### Печать
+
+Печать — фирменный знак BIOVERSE ([seal.tsx](src/components/certificate/seal.tsx)), нарисована кодом. **Не заменяйте её на печать школы, гербовую печать или эмблему министерства**: сертификат демонстрационный, и оттиск реального учреждения превратил бы его в поддельный документ.
+
+---
+
+## Структура
+
+```
+src/
+  app/            страницы (App Router) и роут /api/chat
+  components/     ui/ · layout/ · dashboard/ · charts/ · projects/ · motion/
+  content/        весь текст и цифры
+  lib/            утилиты, экспорт PDF
+public/images/    логотипы и иллюстрации проектов (webp)
+_source/          исходные материалы заказчика и служебные скрипты
+```
+
+---
+
+## Два технических решения, о которых стоит знать
+
+**PDF-сертификат делается растеризацией страницы, а не текстом.** Встроенные шрифты jsPDF не содержат казахских глифов (ә, ғ, қ, ң, ө, ұ, ү, і) и печатают их пустыми квадратами. Поэтому лист сертификата снимается через html2canvas — текст рисует браузер, и шрифт сохраняется полностью. По той же причине печатная область сертификата свёрстана инлайновыми стилями с hex-цветами: html2canvas не умеет разбирать формат `oklch`, в котором Tailwind 4 задаёт свою палитру по умолчанию.
+
+**Шрифт Inter подключён с сабсетами `cyrillic` и `cyrillic-ext`.** Без `cyrillic-ext` казахские буквы уходят на системный шрифт, и начертание рвётся посреди строки.
+
+---
+
+## Служебные скрипты
+
+Лежат в `_source/`, запускаются из корня проекта:
+
+```bash
+node _source/convert.mjs       # исходные jpeg/png → webp в public/images/
+node _source/transparent.mjs   # обрезка логотипов по границам знака
+node _source/shots.mjs         # скриншоты всех страниц (desktop + mobile) и проверка на вылет по ширине
+node _source/test-pdf.mjs      # проверка скачивания PDF-сертификата
+node _source/test-ai.mjs       # проверка AI-чата
+node _source/test-portfolio.mjs # график результатов и листалка слайдов
+```
+
+Скриншотные скрипты требуют запущенного `npm run start` и установленного Playwright.
+
+---
+
+## Деплой
+
+Vercel: подключить репозиторий и добавить `OPENROUTER_API_KEY` в переменные окружения проекта. Статический экспорт не подойдёт — роут `/api/chat` работает на сервере.
+
+---
+
+## Стек
+
+Next.js 16 (App Router) · TypeScript · Tailwind CSS 4 · Framer Motion · Recharts · Lucide · qrcode · html2canvas + jsPDF

@@ -1,26 +1,90 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/*
+  BIOVERSE — фирменная палитра.
+  База интерфейса белая: контент живёт на белых карточках, а тёмно-синий
+  и синий работают только акцентами. Тёмный фон допускается лишь в сайдбаре,
+  hero-баннере и нижней полосе возможностей.
+*/
+@theme {
+  --color-navy-50: #eef4ff;
+  --color-navy-100: #dbe6fe;
+  --color-navy-200: #bfd3fe;
+  --color-navy-300: #93b4fd;
+  --color-navy-400: #6090fa;
+  --color-navy-500: #3b6cf6;
+  --color-navy-600: #1d4ed8;
+  --color-navy-700: #1b3fae;
+  --color-navy-800: #12306b;
+  --color-navy-900: #0b2a5b;
+  --color-navy-950: #071c3d;
+
+  --color-brand: #1d4ed8;
+  --color-brand-deep: #0b2a5b;
+  --color-leaf: #16a34a;
+  --color-leaf-soft: #86c440;
+
+  --color-surface: #ffffff;
+  --color-canvas: #f5f7fa;
+  --color-hairline: #e6ecf5;
+  --color-ink: #0b2a5b;
+  --color-muted: #64748b;
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  --shadow-card: 0 1px 2px rgba(11, 42, 91, 0.04), 0 8px 24px rgba(11, 42, 91, 0.06);
+  --shadow-lift: 0 2px 4px rgba(11, 42, 91, 0.06), 0 18px 40px rgba(11, 42, 91, 0.12);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Тонкий скроллбар, чтобы боковые списки не резали макет. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 999px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::selection {
+  background: #bfd3fe;
+  color: #0b2a5b;
+}
+
+/* Уважаем системную настройку — анимации BIOVERSE декоративные. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
 }

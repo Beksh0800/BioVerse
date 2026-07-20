@@ -32,6 +32,15 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
+
+# рабочие материалы (ТЗ, PRD, скриншоты, тестовые скрипты) — не для публичного репозитория
+/_source
+
+# редакторы/IDE
+.vscode/
+.idea/
+Thumbs.db
 
 # vercel
 .vercel
