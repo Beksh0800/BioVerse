@@ -238,7 +238,7 @@ function SheetBody({ data }: { data: CertificateData }) {
           }}
         />
 
-        <p style={{ marginTop: 16, fontSize: 15, color: MUTED }}>Бұл сертификат</p>
+        <p style={{ marginTop: 12, fontSize: 15, color: MUTED }}>Бұл сертификат</p>
 
         <p
           style={{
@@ -345,7 +345,7 @@ function SheetBody({ data }: { data: CertificateData }) {
         {/* Нижняя строка: номер, девиз и QR проверки подлинности. */}
         <div
           style={{
-            marginTop: 14,
+            marginTop: 10,
             width: "100%",
             display: "flex",
             alignItems: "center",
@@ -355,17 +355,17 @@ function SheetBody({ data }: { data: CertificateData }) {
         >
           <span
             style={{
-              fontSize: 11,
+              fontSize: 13,
               letterSpacing: "0.06em",
               color: MUTED,
-              minWidth: 140,
+              minWidth: 150,
               textAlign: "left",
             }}
           >
             № {data.number}
           </span>
 
-          <span style={{ fontSize: 11, color: MUTED }}>
+          <span style={{ fontSize: 13, color: MUTED }}>
             BIOVERSE — Зертте. Жаса. Бағала. Дамы.
           </span>
 
@@ -373,18 +373,18 @@ function SheetBody({ data }: { data: CertificateData }) {
             style={{
               display: "flex",
               alignItems: "center",
-              gap: 8,
-              minWidth: 150,
+              gap: 10,
+              minWidth: 170,
               justifyContent: "flex-end",
             }}
           >
             <span
               style={{
-                fontSize: 9,
+                fontSize: 11,
                 lineHeight: 1.35,
                 color: MUTED,
                 textAlign: "right",
-                maxWidth: 88,
+                maxWidth: 100,
               }}
             >
               Сертификатты тексеру және жүктеу үшін сканерлеңіз
