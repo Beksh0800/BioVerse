@@ -5,6 +5,7 @@ import Image from "next/image";
 import { author } from "@/content/author";
 import type { CertificateData } from "@/content/certificate";
 import { exportNodeToPdf } from "@/lib/pdf";
+import { certificateLink } from "@/lib/certificate-link";
 import { QrCode } from "@/components/qr-code";
 import { Seal } from "./seal";
 
@@ -217,8 +218,8 @@ function SheetBody({ data }: { data: CertificateData }) {
 
         <h2
           style={{
-            marginTop: 20,
-            fontSize: 44,
+            marginTop: 14,
+            fontSize: 40,
             fontWeight: 800,
             letterSpacing: "0.14em",
             color: NAVY,
@@ -237,12 +238,12 @@ function SheetBody({ data }: { data: CertificateData }) {
           }}
         />
 
-        <p style={{ marginTop: 22, fontSize: 15, color: MUTED }}>Бұл сертификат</p>
+        <p style={{ marginTop: 16, fontSize: 15, color: MUTED }}>Бұл сертификат</p>
 
         <p
           style={{
             marginTop: 8,
-            fontSize: 34,
+            fontSize: 32,
             fontWeight: 800,
             color: BRAND,
             borderBottom: `2px solid ${GOLD_SOFT}`,
@@ -257,7 +258,7 @@ function SheetBody({ data }: { data: CertificateData }) {
 
         <p
           style={{
-            marginTop: 20,
+            marginTop: 14,
             fontSize: 15,
             color: NAVY,
             maxWidth: 660,
@@ -311,7 +312,7 @@ function SheetBody({ data }: { data: CertificateData }) {
           {/* Печать чуть приподнята — так она читается как оттиск
               поверх бланка, а не как элемент строки с реквизитами. */}
           <div style={{ marginBottom: 8 }}>
-            <Seal size={112} />
+            <Seal size={92} />
           </div>
 
           <div style={{ textAlign: "center", minWidth: 210 }}>
@@ -344,7 +345,7 @@ function SheetBody({ data }: { data: CertificateData }) {
         {/* Нижняя строка: номер, девиз и QR проверки подлинности. */}
         <div
           style={{
-            marginTop: 20,
+            marginTop: 14,
             width: "100%",
             display: "flex",
             alignItems: "center",
@@ -391,20 +392,16 @@ function SheetBody({ data }: { data: CertificateData }) {
             {/* Код ведёт на страницу этого же сертификата: посетитель
                 сканирует, видит документ и скачивает PDF.
 
-                Дата уходит в адрес вместе с номером. Без неё страница
-                проверки показывала бы дату из демо-данных, а на бланке
-                стоит дата выписки — при сканировании числа расходились.
-                Дата в формате ДД.ММ.ГГГГ короткая и не разрастается при
-                кодировании, поэтому на читаемости кода это не сказывается
-                (проверяется в _source/test-qr-print.mjs).
+                Все поля бланка едут в самом адресе (см. certificate-link):
+                базы данных нет, и без этого страница проверки показывала бы
+                демонстрационные имя, класс и проект, а не те, что напечатаны
+                на листе.
 
                 Размер выбран так, чтобы на печатном A4 модули оставались
-                различимыми для камеры телефона. */}
-            <QrCode
-              path={`/certificate/${encodeURIComponent(data.number)}?d=${encodeURIComponent(data.date)}`}
-              size={84}
-              showLogo={false}
-            />
+                различимыми для камеры телефона. Запас проверяется в
+                _source/test-qr-print.mjs — его стоит прогонять после любой
+                правки состава полей. */}
+            <QrCode path={certificateLink(data)} size={116} showLogo={false} />
           </span>
         </div>
       </div>

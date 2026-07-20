@@ -70,8 +70,18 @@ export function QrCode({
 
   return (
     <div className={className}>
+      {/*
+        Крупный код можно оформлять — у него много запаса. Мелкий (на бланке
+        сертификата) оставляем прямоугольным и без рамки: скругление срезает
+        белое поле по углам, а именно оно нужно сканеру, чтобы отделить код
+        от фона. Из-за этого печатный код переставал читаться.
+      */}
       <div
-        className="relative mx-auto overflow-hidden rounded-xl bg-white ring-1 ring-hairline"
+        className={
+          showLogo
+            ? "relative mx-auto overflow-hidden rounded-xl bg-white ring-1 ring-hairline"
+            : "relative mx-auto bg-white"
+        }
         style={{ width: size, height: size }}
       >
         {code ? (

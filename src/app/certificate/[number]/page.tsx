@@ -4,6 +4,10 @@ import { ArrowLeft, BadgeCheck } from "lucide-react";
 import { demoCertificate } from "@/content/certificate";
 import { portfolioProject } from "@/content/portfolio";
 import { author } from "@/content/author";
+import {
+  readCertificateParams,
+  readLegacyDate,
+} from "@/lib/certificate-link";
 import { PageContainer } from "@/components/layout/app-shell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -15,18 +19,6 @@ type Params = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
-/**
- * Дата выдачи приходит из QR-кода параметром `d`.
- *
- * Значение из адреса попадает на страницу, поэтому принимаем строго формат
- * ДД.ММ.ГГГГ и всё остальное отбрасываем — иначе в «Берілген күні» можно
- * было бы подставить произвольный текст, просто отредактировав ссылку.
- */
-function readDate(raw: string | string[] | undefined) {
-  const value = Array.isArray(raw) ? raw[0] : raw;
-  if (typeof value !== "string") return null;
-  return /^\d{2}\.\d{2}\.\d{4}$/.test(value) ? value : null;
-}
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { number } = await params;
@@ -50,13 +42,21 @@ export default async function CertificateVerifyPage({
   const { number } = await params;
   const certificateNumber = decodeURIComponent(number);
 
+  /*
+    Данные приезжают из QR-кода: базы нет, и это единственный способ показать
+    именно тот документ, который держат в руках. Ссылку могли открыть и
+    вручную, без параметров, — тогда подставляем демонстрационные значения,
+    чтобы страница осталась осмысленной.
+  */
+  const query = await searchParams;
+  const scanned = readCertificateParams(query.c);
+
   const data = {
-    name: demoCertificate.name,
-    grade: demoCertificate.grade,
-    project: demoCertificate.project,
+    name: scanned.name ?? demoCertificate.name,
+    grade: scanned.grade ?? demoCertificate.grade,
+    project: scanned.project ?? demoCertificate.project,
     number: certificateNumber,
-    // Дата с бланка; если ссылку открыли без параметра — демонстрационная.
-    date: readDate((await searchParams).d) ?? portfolioProject.date,
+    date: scanned.date ?? readLegacyDate(query.d) ?? portfolioProject.date,
   };
 
   return (
