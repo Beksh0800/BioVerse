@@ -7,33 +7,31 @@ import { useCertificateSheet } from "./certificate-sheet";
 
 /**
  * Просмотр сертификата по QR-коду: лист плюс кнопка скачивания.
- * Кнопка продублирована сверху — на телефоне лист занимает весь экран,
- * и до нижней кнопки пришлось бы листать.
+ *
+ * Кнопка только под бланком, а не продублирована и сверху: скачивают после
+ * того, как увидели сам сертификат, а не раньше.
  */
 export function CertificateView({ data }: { data: CertificateData }) {
   const { sheet, download, busy } = useCertificateSheet(data);
 
-  const button = (
-    <Button onClick={download} disabled={busy} size="lg" className="w-full sm:w-auto">
-      {busy ? (
-        <>
-          <Loader2 className="size-4 animate-spin" />
-          Дайындалуда…
-        </>
-      ) : (
-        <>
-          <Download className="size-4" />
-          Сертификатты PDF жүктеу
-        </>
-      )}
-    </Button>
-  );
-
   return (
     <div className="space-y-4 sm:space-y-5">
-      <div className="no-print">{button}</div>
       {sheet}
-      <div className="no-print flex justify-center">{button}</div>
+      <div className="no-print flex justify-center">
+        <Button onClick={download} disabled={busy} size="lg" className="w-full sm:w-auto">
+          {busy ? (
+            <>
+              <Loader2 className="size-4 animate-spin" />
+              Дайындалуда…
+            </>
+          ) : (
+            <>
+              <Download className="size-4" />
+              Сертификатты PDF жүктеу
+            </>
+          )}
+        </Button>
+      </div>
     </div>
   );
 }
