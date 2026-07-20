@@ -164,7 +164,6 @@ export default function AboutPage() {
                 {author.fullName}
               </h3>
               <p className="mt-1 text-sm font-medium text-muted">{author.role}</p>
-              <p className="text-sm text-muted">{author.school}</p>
               <p className="mt-3 max-w-2xl leading-relaxed text-muted">
                 {author.bio}
               </p>
