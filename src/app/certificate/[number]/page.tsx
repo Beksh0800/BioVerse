@@ -73,14 +73,14 @@ export default async function CertificateVerifyPage({
       <Reveal>
         <Card className="mb-4 overflow-hidden sm:mb-5">
           <div className="flex flex-col gap-4 bg-linear-to-r from-green-50 to-white p-5 sm:flex-row sm:items-center sm:gap-5 sm:p-6">
-            <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-leaf text-white">
-              <BadgeCheck className="size-6" />
+            <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-leaf text-white sm:size-14">
+              <BadgeCheck className="size-6 sm:size-7" />
             </span>
             <div className="min-w-0 flex-1">
-              <h1 className="text-lg font-extrabold text-navy-900 sm:text-xl">
+              <h1 className="text-xl font-extrabold text-navy-900 sm:text-2xl">
                 Сертификат түпнұсқалығы расталды
               </h1>
-              <p className="mt-1 text-sm text-muted">
+              <p className="mt-1.5 text-sm text-muted sm:text-base">
                 № {certificateNumber} — BIOVERSE жүйесінде тіркелген
               </p>
             </div>
@@ -109,10 +109,10 @@ export default async function CertificateVerifyPage({
               ].map(([label, value]) => (
                 <div
                   key={label}
-                  className="flex items-baseline justify-between gap-3 border-b border-hairline pb-2.5 last:border-0"
+                  className="flex items-baseline justify-between gap-3 border-b border-hairline pb-3 last:border-0"
                 >
-                  <dt className="shrink-0 text-xs text-muted">{label}</dt>
-                  <dd className="text-right text-sm font-semibold text-navy-900">
+                  <dt className="shrink-0 text-sm text-muted">{label}</dt>
+                  <dd className="text-right text-base font-semibold text-navy-900">
                     {value}
                   </dd>
                 </div>
