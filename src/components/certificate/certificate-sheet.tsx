@@ -38,6 +38,22 @@ const MUTED = "#64748b";
 /** Ширина макета сертификата в px — фиксирована ради предсказуемого PDF. */
 const SHEET_WIDTH = 1000;
 
+/**
+ * Левый край логотипа в верхней части бланка, в координатах нижней строки
+ * (0 = левый край самой этой строки, а не золотой рамки целиком — они не
+ * совпадают из-за paddingLeft строки).
+ *
+ * Логотип центрируется по ширине страницы и имеет фиксированный размер
+ * (высота 46px даёт ширину 291px при исходных пропорциях 900×200), поэтому
+ * его левый край — постоянное число при неизменной вёрстке, а не то, что
+ * выводится из flex-раскладки других элементов. Измерено на отрисованном
+ * бланке при масштабе 1:1 (важно — на суженном экране сертификат
+ * отображается через CSS-transform: scale, и координаты в devtools там
+ * будут другими); если поменяются паддинги золотой рамки или высота
+ * логотипа, значение нужно перемерить.
+ */
+const LOGO_LEFT = 269;
+
 /** Дата в формате 25.05.2026. */
 export function formatDate(date: Date) {
   const pad = (n: number) => String(n).padStart(2, "0");
@@ -165,8 +181,18 @@ function SheetBody({ data }: { data: CertificateData }) {
             QR к краю, слишком большой съедает высоту, и код обрезается
             снизу вместе с угловым маркером (тогда он перестаёт читаться).
             Значение подобрано и проверено сканированием растра PDF.
+
+            Вертикальный бюджет здесь тесный: печать увеличена, а нижняя
+            строка (номер/девиз/QR) отодвинута ниже по просьбе с демо-данными
+            (data.name = «Аружан Серікқызы», demoCertificate.project) запас
+            около нуля. У заметно более длинных ФИО или названия проекта
+            (2 строки вместо 1) этого запаса уже не хватает, и лишнее будет
+            обрезано вместе с overflow: hidden ниже — включая, в худшем
+            случае, QR. Проверять командой из README после правки любых
+            размеров или самих демо-данных:
+              node _source/test-render.mjs && node _source/test-qr-print.mjs
           */
-          padding: "32px 62px 62px",
+          padding: "18px 62px 62px",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -200,7 +226,7 @@ function SheetBody({ data }: { data: CertificateData }) {
           alt="BIOVERSE"
           width={900}
           height={200}
-          style={{ height: 46, width: "auto" }}
+          style={{ height: 42, width: "auto" }}
           priority
         />
 
@@ -218,7 +244,7 @@ function SheetBody({ data }: { data: CertificateData }) {
 
         <h2
           style={{
-            marginTop: 14,
+            marginTop: 8,
             fontSize: 40,
             fontWeight: 800,
             letterSpacing: "0.14em",
@@ -230,7 +256,7 @@ function SheetBody({ data }: { data: CertificateData }) {
 
         <div
           style={{
-            marginTop: 10,
+            marginTop: 8,
             width: 120,
             height: 3,
             backgroundColor: GOLD,
@@ -238,7 +264,7 @@ function SheetBody({ data }: { data: CertificateData }) {
           }}
         />
 
-        <p style={{ marginTop: 12, fontSize: 15, color: MUTED }}>Бұл сертификат</p>
+        <p style={{ marginTop: 10, fontSize: 15, color: MUTED }}>Бұл сертификат</p>
 
         <p
           style={{
@@ -258,7 +284,7 @@ function SheetBody({ data }: { data: CertificateData }) {
 
         <p
           style={{
-            marginTop: 14,
+            marginTop: 8,
             fontSize: 15,
             color: NAVY,
             maxWidth: 660,
@@ -312,7 +338,7 @@ function SheetBody({ data }: { data: CertificateData }) {
           {/* Печать чуть приподнята — так она читается как оттиск
               поверх бланка, а не как элемент строки с реквизитами. */}
           <div style={{ marginBottom: 8 }}>
-            <Seal size={92} />
+            <Seal size={100} />
           </div>
 
           <div style={{ textAlign: "center", minWidth: 210 }}>
@@ -342,15 +368,21 @@ function SheetBody({ data }: { data: CertificateData }) {
           </div>
         </div>
 
-        {/* Нижняя строка: номер, девиз и QR проверки подлинности. */}
+        {/* Нижняя строка: номер, девиз и QR проверки подлинности.
+
+            position: relative — точка отсчёта для девиза ниже: он выровнен
+            не по центру строки, а строго по левому краю логотипа сверху,
+            для чего его позиция задана в тех же координатах контентной
+            области, что и у логотипа (см. LOGO_LEFT). */}
         <div
           style={{
-            marginTop: 10,
+            marginTop: 18,
             width: "100%",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
             gap: 16,
+            position: "relative",
           }}
         >
           <span
@@ -365,7 +397,22 @@ function SheetBody({ data }: { data: CertificateData }) {
             № {data.number}
           </span>
 
-          <span style={{ fontSize: 13, color: MUTED }}>
+          {/* Логотип наверху рендерится по центру страницы своей фиксированной
+              шириной (291px при высоте 46px), поэтому его левый край — число
+              постоянное для этой вёрстки, а не то, что можно выразить через
+              text-align/margin у соседних flex-элементов. Измерено один раз
+              и зафиксировано, как и остальные пиксельные размеры бланка. */}
+          <span
+            style={{
+              position: "absolute",
+              left: LOGO_LEFT,
+              top: "50%",
+              transform: "translateY(-50%)",
+              fontSize: 13,
+              color: MUTED,
+              whiteSpace: "nowrap",
+            }}
+          >
             BIOVERSE — Зертте. Жаса. Бағала. Дамы.
           </span>
 
