@@ -5,7 +5,7 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { Logo } from "./logo";
-import { SidebarNav, SidebarProfile } from "./sidebar";
+import { SidebarNav } from "./sidebar";
 
 /** Шапка с выдвижным меню — заменяет сайдбар на планшете и телефоне. */
 export function MobileNav() {
@@ -64,7 +64,6 @@ export function MobileNav() {
               <div className="flex-1 overflow-y-auto">
                 <SidebarNav onNavigate={() => setOpen(false)} />
               </div>
-              <SidebarProfile />
             </motion.aside>
           </>
         )}

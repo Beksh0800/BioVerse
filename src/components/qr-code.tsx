@@ -5,12 +5,26 @@ import Image from "next/image";
 import QRCode from "qrcode";
 
 /**
- * QR-код портфолио.
+ * QR-код портфолио и сертификата.
  *
- * URL берётся из адреса страницы уже в браузере: на этапе сборки настоящий
- * домен неизвестен, а код должен открываться и на localhost во время показа,
- * и на боевом адресе после деплоя. `path` подставляется в тот же origin.
+ * Адрес берётся из `NEXT_PUBLIC_SITE_URL`, если переменная задана, и только
+ * иначе — из адреса открытой страницы.
+ *
+ * Так сделано из-за сертификата. Его QR попадает в PDF, который распечатают
+ * и отдадут на руки, поэтому ссылка должна пережить и смену окружения, и
+ * следующий деплой. Без явного адреса код наследовал бы тот, откуда PDF
+ * скачали: с локальной машины — `localhost` (по такой ссылке не откроется
+ * ни у кого), с превью-деплоя Vercel — временный адрес вида
+ * `...-git-main-xxx.vercel.app`, который меняется при каждом пуше.
  */
+function resolveBaseUrl() {
+  const configured = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  // Хвостовой слэш убираем: `new URL` его и так учтёт, но в подписи под кодом
+  // адрес выглядел бы с двойным слэшем.
+  if (configured) return configured.replace(/\/+$/, "");
+  return window.location.origin;
+}
+
 export function QrCode({
   path = "/portfolio",
   size = 220,
@@ -33,7 +47,7 @@ export function QrCode({
 
   useEffect(() => {
     let active = true;
-    const url = new URL(path, window.location.origin).toString();
+    const url = new URL(path, resolveBaseUrl()).toString();
 
     QRCode.toDataURL(url, {
       // Рисуем сильно крупнее, чем показываем: код печатается в PDF и

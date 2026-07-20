@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   ArrowRight,
@@ -24,6 +25,7 @@ import {
   teacherReview,
 } from "@/content/portfolio";
 import { getProject } from "@/content/projects";
+import { dashboardStats } from "@/content/site";
 import { criteria, totalScore } from "@/content/bioscore";
 import { PageContainer, PageHeader } from "@/components/layout/app-shell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -32,7 +34,6 @@ import { Progress } from "@/components/ui/progress";
 import { ButtonLink } from "@/components/ui/button";
 import { QrCode } from "@/components/qr-code";
 import { GrowthChart } from "@/components/charts/growth-chart";
-import { SlideDeck } from "@/components/portfolio/slide-deck";
 import { Reveal, Stagger, StaggerItem } from "@/components/motion/reveal";
 
 export const metadata: Metadata = {
@@ -46,6 +47,10 @@ export default function PortfolioPage() {
      методики, дублировать их в portfolio.ts значило бы разойтись при правке. */
   const project = getProject(portfolioProject.projectId);
   if (!project) notFound();
+
+  /* Берём из счётчика дашборда, а не вписываем число: иначе после правки
+     статистики портфолио начнёт противоречить главной странице. */
+  const totalProjects = dashboardStats[0].value;
 
   return (
     <PageContainer>
@@ -64,6 +69,17 @@ export default function PortfolioPage() {
               <h2 className="mt-4 text-2xl leading-tight font-bold sm:text-3xl">
                 {project.title}
               </h2>
+
+              {/* Масштаб работы учителя: без этой строки страница читается так,
+                  будто платформа существует ради одного проекта. */}
+              <Link
+                href="/projects"
+                className="mt-3 inline-flex items-center gap-1.5 text-sm text-navy-100 underline-offset-4 hover:text-white hover:underline"
+              >
+                {portfolioProject.supervisor} жетекшілік ететін{" "}
+                {totalProjects} жобаның бірі
+                <ArrowRight className="size-3.5" />
+              </Link>
 
               <dl className="mt-6 grid gap-x-8 gap-y-4 sm:grid-cols-2">
                 {[
@@ -421,22 +437,7 @@ export default function PortfolioPage() {
         </Reveal>
       </div>
 
-      {/* 9. Презентация защиты */}
-      <Reveal>
-        <Card className="mt-4 sm:mt-5">
-          <CardHeader className="pb-3">
-            <CardTitle>Қорғау презентациясы</CardTitle>
-            <p className="mt-1 text-sm text-muted">
-              Слайдтарды оқтар арқылы қараңыз
-            </p>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <SlideDeck />
-          </CardContent>
-        </Card>
-      </Reveal>
-
-      {/* 10. Рефлексия + 11. Отзыв учителя */}
+      {/* 9. Рефлексия + 10. Отзыв учителя */}
       <div className="mt-4 grid gap-4 sm:mt-5 sm:gap-5 xl:grid-cols-2">
         <Reveal>
           <Card className="h-full">

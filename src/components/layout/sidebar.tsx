@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { navItems } from "@/content/nav";
-import { author } from "@/content/author";
 import { Icon } from "@/components/ui/icon";
 import { Logo } from "./logo";
 import { cn } from "@/lib/utils";
@@ -48,21 +47,12 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   );
 }
 
-export function SidebarProfile() {
-  return (
-    <div className="mx-3 mb-3 flex items-center gap-3 rounded-xl bg-white/8 px-3 py-3">
-      <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-navy-400 to-brand text-sm font-bold text-white">
-        {author.initial}
-      </span>
-      <span className="min-w-0">
-        <span className="block truncate text-sm font-semibold text-white">
-          {author.fullName}
-        </span>
-        <span className="block truncate text-xs text-navy-200">Мұғалім</span>
-      </span>
-    </div>
-  );
-}
+/*
+  Карточки профиля внизу сайдбара здесь нет намеренно, хотя в UI-референсе
+  она была. Профиль подразумевает вход в систему, а регистрации и кабинетов
+  в проекте нет — на защите это первое, во что упирается взгляд. Автор
+  представлен там, где для этого есть место: в разделе «BIOVERSE туралы».
+*/
 
 /** Постоянный сайдбар для больших экранов. */
 export function Sidebar() {
@@ -72,7 +62,6 @@ export function Sidebar() {
         <Logo variant="light" size="sm" subtitle="PBL Ecosystem" />
       </Link>
       <SidebarNav />
-      <SidebarProfile />
     </aside>
   );
 }
