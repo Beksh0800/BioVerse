@@ -327,8 +327,10 @@ function SheetBody({ data }: { data: CertificateData }) {
                 paddingBottom: 4,
               }}
             >
+              {/* Сжатая форма имени: полное «Кенжебекова Айсулу Мұратқызы»
+                  не вписывается в фиксированную ширину подписи (210px). */}
               <span style={{ fontSize: 17, fontWeight: 700, color: NAVY }}>
-                {author.fullName}
+                {author.shortName}
               </span>
             </div>
             <p

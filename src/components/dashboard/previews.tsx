@@ -184,7 +184,7 @@ export function CertificatePreview() {
             </span>
             <span className="text-left">
               <span className="block text-[11px] font-semibold text-navy-900">
-                {author.fullName}
+                {author.shortName}
               </span>
               <span className="block text-[10px] text-muted">
                 {portfolioProject.date}

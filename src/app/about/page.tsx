@@ -164,6 +164,16 @@ export default function AboutPage() {
                 {author.fullName}
               </h3>
               <p className="mt-1 text-sm font-medium text-muted">{author.role}</p>
+              <p className="text-sm text-muted">{author.school}</p>
+
+              <div className="mt-2.5 flex flex-wrap justify-center gap-1.5 sm:justify-start">
+                {author.credentials.map((item) => (
+                  <Badge key={item} tone="muted">
+                    {item}
+                  </Badge>
+                ))}
+              </div>
+
               <p className="mt-3 max-w-2xl leading-relaxed text-muted">
                 {author.bio}
               </p>

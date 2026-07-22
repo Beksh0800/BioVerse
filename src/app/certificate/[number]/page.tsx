@@ -103,7 +103,9 @@ export default async function CertificateVerifyPage({
                 ["Оқушы", data.name],
                 ["Сынып", data.grade],
                 ["Жоба", data.project],
-                ["Жетекші", author.fullName],
+                // Короткая форма — так же, как подписано на самом бланке
+                // чуть ниже; полное имя тут смотрелось бы как другой человек.
+                ["Жетекші", author.shortName],
                 ["Берілген күні", data.date],
                 ["BIO SCORE", `${demoCertificate.score}/100`],
               ].map(([label, value]) => (

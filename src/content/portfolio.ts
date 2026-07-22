@@ -10,6 +10,8 @@
  * рефлексии ученицы и отзыва учителя у нас нет, тексты написаны для показа.
  */
 
+import { author } from "./author";
+
 export const portfolioProject = {
   projectId: "photosynthesis",
   /* Короткое имя проекта — для мест, где полное название не помещается:
@@ -18,7 +20,9 @@ export const portfolioProject = {
   title: "Өсімдіктердің фотосинтезі",
   student: "Аружан Серікқызы",
   grade: '7 "А" сынып',
-  supervisor: "Айсұлу А.",
+  // Не дублируем имя строкой: раньше здесь стояло отдельное "Айсұлу А.",
+  // и правка фамилии в одном месте не задела бы это. Теперь один источник.
+  supervisor: author.shortName,
   subject: "Биология",
   date: "25.05.2026",
   participants: 4,
